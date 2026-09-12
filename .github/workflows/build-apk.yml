@@ -5,6 +5,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+# ✅ 明確宣告需要 contents 寫入權限（建立 Release 用）
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     name: Build APK
@@ -37,7 +41,6 @@ jobs:
           import os, struct, zlib
 
           def make_png(width, height, r, g, b):
-              """生成純色方形 PNG（不需要任何外部套件）"""
               def chunk(tag, data):
                   c = zlib.crc32(tag + data) & 0xFFFFFFFF
                   return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', c)
@@ -49,7 +52,6 @@ jobs:
                       + chunk(b'IDAT', idat_data)
                       + chunk(b'IEND', b''))
 
-          # 各密度圖示尺寸 (px)
           densities = {
               'mipmap-mdpi':    48,
               'mipmap-hdpi':    72,
@@ -57,9 +59,7 @@ jobs:
               'mipmap-xxhdpi':  144,
               'mipmap-xxxhdpi': 192,
           }
-
-          # 田農大腦主題：農業綠 #2E7D32
-          R, G, B = 46, 125, 50
+          R, G, B = 46, 125, 50  # 農業綠 #2E7D32
 
           for folder, size in densities.items():
               path = f'app/src/main/res/{folder}'
@@ -68,9 +68,8 @@ jobs:
               for name in ['ic_launcher.png', 'ic_launcher_round.png']:
                   with open(f'{path}/{name}', 'wb') as f:
                       f.write(png_data)
-                  print(f'✅ 建立 {path}/{name} ({size}x{size}px)')
-
-          print('🎉 所有圖示生成完成！')
+                  print(f'✅ {path}/{name} ({size}x{size}px)')
+          print('🎉 圖示生成完成！')
           EOF
 
       - name: Grant execute permission for gradlew
@@ -79,6 +78,7 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # ✅ 上傳 APK（無論 Release 成功與否都能下載）
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -86,27 +86,27 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      - name: Create Release
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      # ✅ 建立 GitHub Release（需要 contents: write 權限）
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: 田農大腦 v1.0.${{ github.run_number }}
+          name: "田農大腦 v1.0.${{ github.run_number }}"
           body: |
             ## 🌾 田農大腦・手機智慧診斷隨身版
 
-            ### 安裝方式
-            1. 在 Android 手機上下載 `田農大腦.apk`
+            ### 📲 安裝方式
+            1. 點擊下方 `app-debug.apk` 下載到手機
             2. 開啟「設定」→「安全性」→ 允許「安裝未知來源應用程式」
             3. 點擊 APK 檔案安裝
-            4. 安裝後桌面出現「田農大腦」圖示即完成！
+            4. 桌面出現「田農大腦」綠色圖示即完成！
 
-            ### 本版本功能
-            - 15 種屏東在地作物智慧病蟲害診斷
-            - 高改場雙軌處方資料庫（有機友善 + 化學用藥/PHI）
-            - 手機相機直接拍攝作物病徵
-            - Groq AI 多模態影像分析
-            - 田間弱網最佳化（前端壓縮至 ~100KB）
+            ### ✨ 功能特色
+            - 🌱 15 種屏東在地作物智慧病蟲害診斷
+            - 📋 高改場雙軌處方資料庫（有機友善 + 化學用藥 PHI）
+            - 📸 手機相機直接拍攝作物病徵
+            - 🤖 Groq AI 多模態影像分析
+            - 📶 田間弱網最佳化（~100KB 極速傳輸）
           files: app/build/outputs/apk/debug/app-debug.apk
           draft: false
           prerelease: false
