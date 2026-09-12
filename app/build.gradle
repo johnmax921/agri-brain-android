@@ -1,0 +1,45 @@
+// APP 模組層級 build.gradle
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'tw.farmers.agribrain'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "tw.farmers.agribrain"
+        minSdk 21          // 支援 Android 5.0+（涵蓋 99% 在用裝置）
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // 排除重複 META-INF 衝突
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core:1.12.0'
+}

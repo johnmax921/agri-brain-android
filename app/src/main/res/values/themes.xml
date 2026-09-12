@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 繼承 NoActionBar 讓 WebView 佔滿全螢幕 -->
+    <style name="Theme.AgriBrain" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>

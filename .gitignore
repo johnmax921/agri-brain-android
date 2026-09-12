@@ -1,0 +1,11 @@
+.gradle
+.idea
+/local.properties
+/.android
+/captures
+/keystore
+*.iml
+build/
+app/build/
+.DS_Store
+Thumbs.db
